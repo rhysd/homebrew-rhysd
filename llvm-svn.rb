@@ -25,7 +25,7 @@ class LlvmSvn < Formula
   head      'http://llvm.org/git/llvm.git'
 
   option :universal
-  option 'enable-libcpp', 'Build libc++ standard library support'
+  option 'with-libcxx', 'Build libc++ standard library support'
   option 'with-clang', 'Build Clang C/ObjC/C++ frontend'
   option 'with-asan', 'Include support for -faddress-sanitizer (from compiler-rt)'
   option 'disable-shared', "Don't build LLVM as a shared library"
@@ -56,7 +56,7 @@ class LlvmSvn < Formula
 
     Libcxx.new('libcxx').brew do
       (buildpath/'projects/libcxx').install Dir['*']
-    end if build.include? 'enable-libcpp'
+    end if build.include? 'with-libcxx'
 
     if build.universal?
       ENV['UNIVERSAL'] = '1'
@@ -65,7 +65,7 @@ class LlvmSvn < Formula
 
     ENV['REQUIRES_RTTI'] = '1' if build.include? 'rtti'
 
-    install_prefix = lib/"sandbox"
+    install_prefix = lib/"llvm-#{version}"
 
     args = [
       "--prefix=#{install_prefix}",
@@ -75,7 +75,7 @@ class LlvmSvn < Formula
       "--disable-bindings",
     ]
 
-    args << '--enable-libcpp' if build.include? 'enable-libcpp'
+    args << '--enable-libcpp' if build.include? 'with-libcxx'
 
     if build.include? 'all-targets'
       args << '--enable-targets=all'
@@ -101,7 +101,7 @@ class LlvmSvn < Formula
         "SYMROOT=#{buildpath}/projects/libcxx"
       ]
       system 'make', 'install', *libcxx_make_args
-    end if build.include? 'enable-libcpp'
+    end if build.include? 'with-libcxx'
 
     if python
       # Install llvm python bindings.
@@ -132,10 +132,10 @@ class LlvmSvn < Formula
   end
 
   def caveats
-    suffix = `#{lib}/sandbox/bin/clang --version`.split("\n").first.slice(/\d\.\d/)
+    suffix = `#{lib}/llvm-#{version}/bin/clang --version`.split("\n").first.slice(/\d\.\d/)
     s = ''
     s += python.standard_caveats if python
-    if build.include? 'enable-libcpp'
+    if build.include? 'with-libcxx'
       include_path = HOMEBREW_PREFIX/"lib/llvm-#{suffix}/c++/v1"
       libs_path = HOMEBREW_PREFIX/"lib/llvm-#{suffix}/usr/lib"
       s += <<-EOS.undent
