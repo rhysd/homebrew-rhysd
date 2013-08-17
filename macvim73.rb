@@ -1,7 +1,7 @@
 require 'formula'
 
 # Reference: https://github.com/b4winckler/macvim/wiki/building
-class MacvimStable < Formula
+class Macvim73 < Formula
   homepage 'http://code.google.com/p/macvim/'
   url 'https://github.com/rhysd/macvim.git', :branch => 'latest-stable'
   version '7.3-stable-latest'
