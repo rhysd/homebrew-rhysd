@@ -7,7 +7,7 @@ end
 
 class ClangToolsExtra < Formula
   homepage  'http://llvm.org/'
-  head      'http://llvm.org/git/compiler-rt.git'
+  head      'http://llvm.org/git/clang-tools-extra.git'
 end
 
 class CompilerRt < Formula
@@ -27,6 +27,7 @@ class LlvmSvn < Formula
   option :universal
   option 'with-libcxx', 'Build libc++ standard library support'
   option 'with-clang', 'Build Clang C/ObjC/C++ frontend'
+  option 'with-clang-tools-extra', 'Build Clang Tools Extra'
   option 'with-asan', 'Include support for -faddress-sanitizer (from compiler-rt)'
   option 'disable-shared', "Don't build LLVM as a shared library"
   option 'all-targets', 'Build all target backends'
@@ -48,7 +49,7 @@ class LlvmSvn < Formula
 
     ClangToolsExtra.new('clang-tools-extra').brew do
       (buildpath/'tools/clang/tools/extra').install Dir['*']
-    end if build.include? 'with-clang'
+    end if build.include?('with-clang') && build.include?('with-clang-tools-extra')
 
     CompilerRt.new("compiler-rt").brew do
       (buildpath/'projects/compiler-rt').install Dir['*']
@@ -88,9 +89,11 @@ class LlvmSvn < Formula
 
     system './configure', *args
     system 'make', 'VERBOSE=1'
+    puts "before installing llvm [rhysd]"
     system 'make', 'VERBOSE=1', 'install'
 
     suffix = `#{install_prefix}/bin/clang --version`.split("\n").first.slice(/\d\.\d/)
+    puts "******************** suffix is #{suffix} ********************** [rhysd]"
 
     # Putting libcxx in projects only ensures that headers are installed.
     # Manually "make install" to actually install the shared libs.
@@ -100,6 +103,7 @@ class LlvmSvn < Formula
         "DSTROOT=#{install_prefix}",
         "SYMROOT=#{buildpath}/projects/libcxx"
       ]
+      puts "before installing libcxx [rhysd]"
       system 'make', 'install', *libcxx_make_args
     end if build.include? 'with-libcxx'
 
