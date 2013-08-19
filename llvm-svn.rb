@@ -89,11 +89,9 @@ class LlvmSvn < Formula
 
     system './configure', *args
     system 'make', 'VERBOSE=1'
-    puts "before installing llvm [rhysd]"
     system 'make', 'VERBOSE=1', 'install'
 
     suffix = `#{install_prefix}/bin/clang --version`.split("\n").first.slice(/\d\.\d/)
-    puts "******************** suffix is #{suffix} ********************** [rhysd]"
 
     # Putting libcxx in projects only ensures that headers are installed.
     # Manually "make install" to actually install the shared libs.
@@ -103,7 +101,6 @@ class LlvmSvn < Formula
         "DSTROOT=#{install_prefix}",
         "SYMROOT=#{buildpath}/projects/libcxx"
       ]
-      puts "before installing libcxx [rhysd]"
       system 'make', 'install', *libcxx_make_args
     end if build.include? 'with-libcxx'
 
