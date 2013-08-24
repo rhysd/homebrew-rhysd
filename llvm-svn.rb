@@ -45,19 +45,19 @@ class LlvmSvn < Formula
 
     Clang.new('clang').brew do
       (buildpath/'tools/clang').install Dir['*']
-    end if build.include? 'with-clang'
+    end if build.with? 'clang'
 
     ClangToolsExtra.new('clang-tools-extra').brew do
       (buildpath/'tools/clang/tools/extra').install Dir['*']
-    end if build.include?('with-clang') && build.include?('with-clang-tools-extra')
+    end if build.with?('clang') && build.with?('clang-tools-extra')
 
     CompilerRt.new("compiler-rt").brew do
       (buildpath/'projects/compiler-rt').install Dir['*']
-    end if build.include? 'with-asan'
+    end if build.with? 'asan'
 
     Libcxx.new('libcxx').brew do
       (buildpath/'projects/libcxx').install Dir['*']
-    end if build.include? 'with-libcxx'
+    end if build.with? 'libcxx'
 
     if build.universal?
       ENV['UNIVERSAL'] = '1'
@@ -76,7 +76,7 @@ class LlvmSvn < Formula
       "--disable-bindings",
     ]
 
-    args << '--enable-libcpp' if build.include? 'with-libcxx'
+    args << '--enable-libcpp' if build.with? 'libcxx'
 
     if build.include? 'all-targets'
       args << '--enable-targets=all'
@@ -102,7 +102,7 @@ class LlvmSvn < Formula
         "SYMROOT=#{buildpath}/projects/libcxx"
       ]
       system 'make', 'install', *libcxx_make_args
-    end if build.include? 'with-libcxx'
+    end if build.with? 'libcxx'
 
     if python
       # Install llvm python bindings.
@@ -110,7 +110,7 @@ class LlvmSvn < Formula
       python.site_packages.install buildpath/"bindings/python/llvm-#{suffix}"
       # Install clang tools and bindings if requested.
       mv buildpath/'tools/clang/bindings/python/clang', buildpath/"tools/clang/bindings/python/clang-#{suffix}"
-      python.site_packages.install buildpath/"tools/clang/bindings/python/clang-#{suffix}" if build.include? 'with-clang'
+      python.site_packages.install buildpath/"tools/clang/bindings/python/clang-#{suffix}" if build.with? 'clang'
     end
 
     # Link executables to bin and add suffix to avoid conflicts
@@ -136,7 +136,7 @@ class LlvmSvn < Formula
     suffix = `#{lib}/llvm-#{version}/bin/clang --version`.split("\n").first.slice(/\d\.\d/)
     s = ''
     s += python.standard_caveats if python
-    if build.include? 'with-libcxx'
+    if build.with? 'libcxx'
       include_path = HOMEBREW_PREFIX/"lib/llvm-#{suffix}/c++/v1"
       libs_path = HOMEBREW_PREFIX/"lib/llvm-#{suffix}/usr/lib"
       s += <<-EOS.undent
