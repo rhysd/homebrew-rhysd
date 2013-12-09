@@ -29,8 +29,6 @@ class MacvimRhysd < Formula
     {
       :p1 => [
               'https://bitbucket.org/k_takata/vim-ktakata-mq/raw/98482edd59b30091f30371dcadad4e3ffcc132be/vim-7.4.035-breakindent.patch',
-              'https://bitbucket.org/koron/vim-kaoriya-patches/raw/6658116d59073a4471a83fea41a0791718773a96/X010-autoload_cache.diff',
-              'https://gist.github.com/Shougo/5654189/raw'
              ]
     }
   end
